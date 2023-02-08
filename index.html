@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <?!= HtmlService.createHtmlOutputFromFile('css').getContent(); ?>
+  </head>
+  <body>
+      <?
+        //連想配列
+        team_point = {}
+        team_lang = {}
+        team_url = {}
+
+        for(var i=0;i<memberData.length;i++){
+          member_id = memberData[i][0]
+          team_name = memberData[i][1]
+          member_point = memberData[i][2]
+          member_lang = memberData[i][3]
+          member_url = memberData[i][4]
+
+          if (team_name === ""){
+            continue
+          }
+
+          if ( -1 == Object.keys(team_point).indexOf(team_name)){//連想配列に含まれない場合初期化
+            team_point[team_name] = 0
+          }
+          if (team_point[team_name] < member_point){
+            team_point[team_name] = member_point
+            team_lang[team_name] = member_lang
+            team_url[team_name] = member_url
+            
+          }
+        }
+                
+        //キーを含んだ配列に変換 オブジェクト⇒配列
+        var array = Object.keys(team_point).map((k)=>({ key: k, value: team_point[k] }));
+
+        //値段順
+        array.sort((a, b) => b.value - a.value);
+
+        output.append('<table class="table">')
+        output.append('<thead>')
+        output.append('<tr>')
+        output.append('<th scope="col">#</th>')
+        output.append('<th scope="col">Team</th>')
+        //output.append('<th scope="col">Url</th>')
+        output.append('<th scope="col">Point</th>')
+        output.append('<th scope="col">Lang</th>')
+        output.append('</tr>')
+        output.append('</thead><tbody>')
+
+        for(var i=0;i<array.length;i++){
+          output.append('<tr>')
+          output.append('<th scope="row">'+(i+1)+'</th>')
+          team_title = array[i].key
+          if (team_url[array[i].key]){
+            team_title = '<a href="' + team_url[array[i].key] +'" target="_blank">' + team_title + '</a>'
+          }
+          
+          if (i==0){
+            team_title = '&#x1f451;'+team_title
+          }else{
+            team_title = team_title
+          }
+          output.append('<td>'+team_title+'</td>')
+          //output.append('<td>'+team_url[array[i].key]+'</td>')
+          output.append('<td>'+array[i].value+'</td>')
+          output.append('<td>'+team_lang[array[i].key]+'</td>')
+          output.append('</tr>')
+        }
+
+        output.append('</tbody></table>')
+      ?>
+    </ul>
+
+    <?!= HtmlService.createHtmlOutputFromFile('js').getContent(); ?>
+  </body>
+</html>
